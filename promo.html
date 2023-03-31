@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>OFFERNAME™</title>
+  <style>@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}body{background:#dbe1f0;width:370px;margin:0 auto;border:0}.product img{width:60%;}i.uil.uil-angle-down{background-image:url(assets/img/down-arrow.png);background-size:cover;display:block;width:20px;height:20px;opacity:0.25;}.geo img{padding-left:30px;padding-right:30px;margin-top:20px;margin-bottom:0px;}.trust img{width:80%;max-height:400px!important;}p{font-size:15px;}a{color:#848ba0;text-decoration:none;}h1{font-size:30px;margin-bottom:15px;}hr{color:#c0c4cf;background:#c0c4cf;height:2px;border:none;margin-top:5px;margin-bottom:15px;}.hr hr{color:#c0c4cf;background:#c0c4cf;height:2px;border:none;margin-top:0px;margin-bottom:25px;}::selection{color:#fff;background:#4285f4;}.wrapper{width:370px;margin:0 auto;padding-left:20px;padding-right:20px;}.select-btn,li{display:flex;align-items:center;cursor:pointer;}.select-btn{height:65px;padding:0 20px;font-size:22px;background:#fff;border-radius:7px;justify-content:space-between;box-shadow:0 10px 25px rgba(0,0,0,0.1);}.select-btn i{font-size:31px;transition:transform 0.3s linear;}.wrapper.active .select-btn i{transform:rotate(-180deg);}.content{display:none;padding:20px;margin-top:15px;background:#fff;border-radius:7px;box-shadow:0 10px 25px rgba(0,0,0,0.1);}.wrapper.active .content{display:block;}.content .search{position:relative;}img.product{max-height:350px;-o-object-fit:contain;object-fit:contain;}.search i{top:50%;left:15px;color:#999;font-size:20px;pointer-events:none;transform:translateY(-50%);position:absolute;}.search input{height:50px;width:100%;outline:none;font-size:17px;border-radius:5px;padding:0 20px 0 43px;border:1px solid #B3B3B3;}.search input:focus{padding-left:42px;border:2px solid #4285f4;}.search input::placeholder{color:#bfbfbf;}.content .options{margin-top:10px;max-height:250px;overflow-y:auto;padding-right:7px;}.options::-webkit-scrollbar{width:7px;}.options::-webkit-scrollbar-track{background:#f1f1f1;border-radius:25px;}.options::-webkit-scrollbar-thumb{background:#ccc;border-radius:25px;}.options::-webkit-scrollbar-thumb:hover{background:#b3b3b3;}.options li{height:50px;padding:0 13px;font-size:21px;}.options li:hover,li.selected{border-radius:5px;background:#f2f2f2;}</style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ </head>
+ <body>
+ <center><br>
+ <div class="product">
+   <img class="product" src="" width="350px">
+ </div>
+ <h1>OFFERNAME™</h1>
+ <div class="hr">
+   <hr width="60%">
+ </div>
+ <div class="wrapper">
+   <div class="select-btn">
+     <span>Select Country</span>
+     <i class="uil uil-angle-down"></i>
+   </div>
+   <div class="content">
+     <div class="search">
+       <i class="uil uil-search"></i>
+       <input spellcheck="false" type="text" placeholder="Search">
+     </div>
+     <ul class="options"></ul>
+   </div>
+ </div><br>
+   <footer class="py-3 text-center">
+ <div class="container"><br>
+   <div class="trust">
+     <img src="assets/img/trust.png" width="100%">
+   </div>
+   <hr width="60%">
+   <p class="text-center"><a rel="nofollow" href="privacy.html">Privacy Policy</a> - <a href="terms.html">Terms &amp; Conditions</a>
+     <p class="fs-6">Copyright 2023 All Right Reserved</p>
+ </div>
+ </footer>
+ </center>
+<script>
+  const redirectURL = "redirect.php?domain=";
+  const pageTitle = document.querySelector("title");
+  const offerName = document.querySelector("h1");
+  const productImage = document.querySelector(".product img");
+  const wrapper = document.querySelector(".wrapper");
+  const selectBtn = wrapper.querySelector(".select-btn");
+  const searchInp = wrapper.querySelector("input");
+  const options = wrapper.querySelector(".options");
+  const domain = window.location.hostname;
+
+  // Get the file name and format it
+  const fileName = location.pathname.split('/').pop().split('.')[0];
+  const formattedName = fileName.replace(/([A-Z])/g, ' $1').trim();
+  const triggerName = formattedName.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+
+  fetch("offers.json")
+    .then((response) => response.json())
+    .then((data) => {
+      const selectedOffer = data.find((offer) => {
+        const isOffer = offer.filename === formattedName;
+        const isAdditionalPage = offer.additional_pages.includes(formattedName);
+        return isOffer || isAdditionalPage;
+      });
+
+      if (selectedOffer) {
+        offerName.textContent = `${selectedOffer.title}™`;
+        pageTitle.textContent = `${selectedOffer.title}™`;
+        productImage.src = selectedOffer.image;
+
+        const affiliateLink = selectedOffer.affiliateLink;
+        const geos = selectedOffer.geos;
+
+        const countries = geos;
+
+        const additionalPageName = selectedOffer.additional_pages.find(
+        (page) => page === formattedName
+      );
+
+      if (additionalPageName) {
+        // You can modify this based on what you want to do with the additional pages
+        console.log(`This is an additional page: ${additionalPageName}`);
+      }
+
+        function addCountry(selectedCountry) {
+          options.innerHTML = "";
+          countries.forEach((country) => {
+            let isSelected = country === selectedCountry ? "selected" : "";
+            options.insertAdjacentHTML(
+              "beforeend",
+              `<li id="${country}" class="${isSelected}">${country}</li>`
+            );
+          });
+        }
+
+        function updateName(countryElement) {
+          searchInp.value = "";
+          addCountry(countryElement.innerText);
+          wrapper.classList.remove("active");
+          selectBtn.firstElementChild.innerText = countryElement.innerText;
+        }
+
+        searchInp.addEventListener("keyup", () => {
+          let filteredCountries = countries.filter((country) => {
+            return country.toLowerCase().startsWith(searchInp.value.toLowerCase());
+          });
+
+          options.innerHTML = "";
+
+          filteredCountries.forEach((country) => {
+            let isSelected = country === selectBtn.firstElementChild.innerText ? "selected" : "";
+            options.insertAdjacentHTML(
+              "beforeend",
+              `<li id="${country}" class="${isSelected}">${country}</li>`
+            );
+          });
+
+          if (!filteredCountries.length) {
+            options.innerHTML = `<p style="margin-top: 10px;">Oops! Country not found</p>`;
+          }
+        });
+
+        selectBtn.addEventListener("click", () => wrapper.classList.toggle("active"));
+
+        options.addEventListener("click", (e) => {
+          if (e.target.tagName === "LI") {
+            updateName(e.target);
+            location.href = "redirect.php?domain=" + btoa(affiliateLink + domain);
+          }
+        });
+
+        addCountry();
+
+      } else {
+        console.error("Offer not found in offers.json");
+      }
+    });
+</script>
+
+ </body>
+ </html>
